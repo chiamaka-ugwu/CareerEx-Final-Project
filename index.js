@@ -1,10 +1,8 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const User = require("./userModel");
-const Wallet = require("./walletModel");
+const { validateRegister, authorization, validateLogin } = require("./middleware");
+const { handleUserRegistration, handleGetAllUsers, handleLogin, handleAddMoney, handleSendMoney, handleResetPassword, handleForgotPassword } = require("./controllers");
 
 dotenv.config();
 
@@ -23,142 +21,27 @@ mongoose.connect(process.env.MONGODB_URL).then(() => {
 });
 
 // USER SIGN UP
-app.post("/signup", async (req, res) => {
-  try {
-    const { email, password, firstName, lastName, phone } = req.body;
-
-    // check email and password fields
-    if (!email) {
-      return res.status(400).json({ message: "Please add your email" });
-    }
-
-    if (!password) {
-      return res.status(400).json({ message: "Please enter password" });
-    }
-
-    // check if user exists
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ message: "User already exists" });
-    }
-
-    // password validation
-    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
-    if (!passwordRegex.test(password)) {
-      return res.status(400).json({
-        message:
-          "Password must be at least 8 characters long and contain at least one letter and one number",
-      });
-    }
-
-    // hash password
-    const hashedPassword = await bcrypt.hash(password, 12);
-
-    // create new user
-    const newUser = new User({
-      email,
-      password: hashedPassword,
-      firstName,
-      lastName,
-      phone,
-    });
-
-    await newUser.save();
-
-    // create wallet
-    const wallet = new Wallet({
-      userId: newUser._id,
-      balance: 0,
-    });
-
-    await wallet.save();
-
-    res.status(201).json({
-      message: "User created successfully",
-      newUser: {
-        email,
-        firstName,
-        lastName,
-        phone,
-        walletId: wallet._id,
-        balance: wallet.balance,
-        currency: wallet.currency,
-      },
-    });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-
-
-
-
-
+app.post("/sign-up", validateRegister, handleUserRegistration);
 
 // USER LOGIN
-app.post("/login", async (req, res) => {
-  try {
-    const { email, password } = req.body;
+app.post("/login", validateLogin, handleLogin);
 
-    // check email and password fields
-    if (!email) {
-      return res.status(400).json({ message: "Please add your email" });
-    }
+// GET ALL USERS
+app.get("/all-users", authorization, handleGetAllUsers);
 
-    if (!password) {
-      return res.status(400).json({ message: "Please enter password" });
-    }
+// FORGOT PASSWORD
+app.post("/forgot-password", handleForgotPassword);
 
-    // check if user exists
-    const user = await User.findOne({ email });
+// RESET PASSWORD
+app.post("/reset-password", authorization, handleResetPassword);
 
-    if (!user) {
-      return res.status(400).json({ message: "User account does not exist" });
-    }
+// Milestone 2: Money Transfers
 
-    // check password
-    const isMatch = await bcrypt.compare(password, user?.password);
-    if (!isMatch) {
-      return res.status(400).json({ message: "Incorrect email or password" });
-    }
+// 1.Add money transfer logic between wallets.
 
-    // generate JWT token
-    const accessToken = jwt.sign({ id: user?._id }, process.env.ACCESS_TOKEN, {
-      expiresIn: "5m",
-    });
+// ADD MONEY TO WALLET
+app.post("/add-money", authorization, handleAddMoney);
 
-    const refreshToken = jwt.sign(
-      { id: user?._id },
-      process.env.REFRESH_TOKEN,
-      {
-        expiresIn: "30d",
-      }
-    );
 
-    // find user wallet
-    const wallet = await Wallet.findOne({ userId: user?._id });
-
-    if (!wallet) {
-        return res.status(400).json({ message: "Wallet not found" });
-    }
-
-    //login user
-    res.status(200).json({
-      message: "User login successful",
-      accessToken,
-      user: {
-        email: user?.email,
-        firstName: user?.firstName,
-        lastName: user?.lastName,
-        phone: user?.phone,
-        walletId: wallet?._id,
-        balance: wallet?.balance,
-        currency: wallet?.currency,
-      },
-      refreshToken,
-    });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
+// SEND MONEY BETWEEN WALLETS
+app.post("/send-money", authorization, handleSendMoney);

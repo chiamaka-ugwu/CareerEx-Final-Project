@@ -15,12 +15,13 @@ const walletSchema = new mongoose.Schema(
       type: String,
       default: "NGN",
     },
-    // transactions: [
-    //   {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: "Transaction",
-    //   },
-    // ],
+    transactions: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Transaction",
+      },
+    ],
+    
   },
   {
     timestamps: true,
