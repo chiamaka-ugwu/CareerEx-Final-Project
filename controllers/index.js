@@ -358,6 +358,64 @@ const handleSendMoney = async (req, res) => {
   }
 };
 
+// MILESTONE 3
+// get wallet balance
+const handleGetWalletBalance = async (req, res) => {
+  try {
+    const { userId } = req.body;
+
+    // check userId field
+    if (!userId) {
+      return res.status(400).json({ message: "Invalid userId" });
+    }
+
+    // find user wallet
+    const wallet = await Wallet.findOne({ userId });
+    if (!wallet) {
+      return res.status(404).json({ message: "Wallet not found" });
+    }
+
+    res.status(200).json({
+      message: "Wallet balance retrieved successfully",
+      balance: wallet.balance,
+      currency: wallet.currency,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// get past transactions
+const handleGetPastTransactions = async (req, res) => {
+  try {
+    const { userId } = req.body;
+
+    // check userId field
+    if (!userId) {
+      return res.status(400).json({ message: "Invalid userId" });
+    }
+
+    // find user wallet
+    const wallet = await Wallet.findOne({ userId });
+    if (!wallet) {
+      return res.status(404).json({ message: "Wallet not found" });
+    }
+
+    // get transactions
+    const transactions = await Transaction.find({
+      $or: [{ sender: userId }, { receiver: userId }],
+    })
+    .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      message: "Transactions retrieved successfully",
+      transactions,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   handleGetAllUsers,
   handleUserRegistration,
@@ -366,4 +424,6 @@ module.exports = {
   handleResetPassword,
   handleAddMoney,
   handleSendMoney,
+  handleGetWalletBalance,
+  handleGetPastTransactions,
 };

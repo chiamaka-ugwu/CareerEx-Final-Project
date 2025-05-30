@@ -1,8 +1,22 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
-const { validateRegister, authorization, validateLogin } = require("./middleware");
-const { handleUserRegistration, handleGetAllUsers, handleLogin, handleAddMoney, handleSendMoney, handleResetPassword, handleForgotPassword } = require("./controllers");
+const {
+  validateRegister,
+  authorization,
+  validateLogin,
+} = require("./middleware");
+const {
+  handleUserRegistration,
+  handleGetAllUsers,
+  handleLogin,
+  handleAddMoney,
+  handleSendMoney,
+  handleResetPassword,
+  handleForgotPassword,
+  handleGetWalletBalance,
+  handleGetPastTransactions,
+} = require("./controllers");
 
 dotenv.config();
 
@@ -42,6 +56,13 @@ app.post("/reset-password", authorization, handleResetPassword);
 // ADD MONEY TO WALLET
 app.post("/add-money", authorization, handleAddMoney);
 
-
 // SEND MONEY BETWEEN WALLETS
 app.post("/send-money", authorization, handleSendMoney);
+
+
+// Milestone 3
+// GET WALLET BALANCE
+app.get("/wallet-balance", authorization, handleGetWalletBalance);
+
+// GET ALL PAST TRANSACTIONS
+app.get("/transactions", authorization, handleGetPastTransactions);
