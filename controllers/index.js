@@ -121,7 +121,7 @@ const handleLogin = async (req, res) => {
 
     // generate JWT token
     const accessToken = jwt.sign({ id: user?._id }, process.env.ACCESS_TOKEN, {
-      expiresIn: "5h",
+      expiresIn: "5m",
     });
 
     const refreshToken = jwt.sign(

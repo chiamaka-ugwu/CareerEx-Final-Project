@@ -1,22 +1,8 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
-const {
-  validateRegister,
-  authorization,
-  validateLogin,
-} = require("./middleware");
-const {
-  handleUserRegistration,
-  handleGetAllUsers,
-  handleLogin,
-  handleAddMoney,
-  handleSendMoney,
-  handleResetPassword,
-  handleForgotPassword,
-  handleGetWalletBalance,
-  handleGetPastTransactions,
-} = require("./controllers");
+const cors = require("cors");
+const routes = require("./routes");
 
 dotenv.config();
 
@@ -25,6 +11,7 @@ const PORT = process.env.PORT || 8000;
 
 // Middleware
 app.use(express.json());
+app.use(cors());
 
 // MongoDB connection
 mongoose.connect(process.env.MONGODB_URL).then(() => {
@@ -34,35 +21,5 @@ mongoose.connect(process.env.MONGODB_URL).then(() => {
   });
 });
 
-// USER SIGN UP
-app.post("/sign-up", validateRegister, handleUserRegistration);
-
-// USER LOGIN
-app.post("/login", validateLogin, handleLogin);
-
-// GET ALL USERS
-app.get("/all-users", authorization, handleGetAllUsers);
-
-// FORGOT PASSWORD
-app.post("/forgot-password", handleForgotPassword);
-
-// RESET PASSWORD
-app.post("/reset-password", authorization, handleResetPassword);
-
-// Milestone 2: Money Transfers
-
-// 1.Add money transfer logic between wallets.
-
-// ADD MONEY TO WALLET
-app.post("/add-money", authorization, handleAddMoney);
-
-// SEND MONEY BETWEEN WALLETS
-app.post("/send-money", authorization, handleSendMoney);
-
-
-// Milestone 3
-// GET WALLET BALANCE
-app.get("/wallet-balance", authorization, handleGetWalletBalance);
-
-// GET ALL PAST TRANSACTIONS
-app.get("/transactions", authorization, handleGetPastTransactions);
+// APIs from route page
+app.use(routes);
