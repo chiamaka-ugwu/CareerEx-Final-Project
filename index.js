@@ -21,5 +21,11 @@ mongoose.connect(process.env.MONGODB_URL).then(() => {
   });
 });
 
+app.get("/", (req, res) => {
+  res.status(200).json({
+    message: "Welcome to the PayFlow",
+  })
+})
+
 // APIs from route page
 app.use(routes);
