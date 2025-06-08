@@ -35,6 +35,6 @@ You can find the full API documentation and test the endpoints here:
 ---
 
 ## Author
-Created by [Chiamaka Ugwu]
-Email: chiamakaugwu.m@gmail.com
-Student ID: CX/AXC/BTD/02/950
+- Created by [Chiamaka Ugwu]
+- Email: chiamakaugwu.m@gmail.com
+- Student ID: CX/AXC/BTD/02/950
