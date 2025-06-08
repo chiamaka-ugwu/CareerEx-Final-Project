@@ -10,6 +10,11 @@ const { validEmail, sendForgotPasswordEmail } = require("../sendMail");
 const handleGetAllUsers = async (req, res) => {
   console.log(req.user);
 
+  // check if user is admin
+  if (req.user.role !== "admin") {
+    return res.status(403).json({ message: "Access denied" });
+  }
+
   const allUser = await findUserService();
 
   res.status(200).json({
@@ -362,7 +367,7 @@ const handleSendMoney = async (req, res) => {
 // get wallet balance
 const handleGetWalletBalance = async (req, res) => {
   try {
-    const { userId } = req.body;
+    const userId = req.user.id;
 
     // check userId field
     if (!userId) {
@@ -388,7 +393,7 @@ const handleGetWalletBalance = async (req, res) => {
 // get past transactions
 const handleGetPastTransactions = async (req, res) => {
   try {
-    const { userId } = req.body;
+    const userId = req.user.id;
 
     // check userId field
     if (!userId) {
@@ -404,8 +409,7 @@ const handleGetPastTransactions = async (req, res) => {
     // get transactions
     const transactions = await Transaction.find({
       $or: [{ sender: userId }, { receiver: userId }],
-    })
-    .sort({ createdAt: -1 });
+    }).sort({ createdAt: -1 });
 
     res.status(200).json({
       message: "Transactions retrieved successfully",
