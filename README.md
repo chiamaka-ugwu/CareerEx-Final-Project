@@ -31,3 +31,10 @@ PayFlow is a simple digital wallet backend API built with Node.js, Express, and 
 
 You can find the full API documentation and test the endpoints here:  
 [View on Postman](https://documenter.getpostman.com/view/41853757/2sB2x3msVr)
+
+---
+
+## Author
+Created by [Chiamaka Ugwu]
+Email: chiamakaugwu.m@gmail.com
+Student ID: CX/AXC/BTD/02/950
